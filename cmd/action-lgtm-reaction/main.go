@@ -98,7 +98,7 @@ func run() error {
 
 	ctx := context.Background()
 
-	gc, err := github.NewClient(githubToken)
+	gc, err := github.NewClient(githubToken, input.Enterprise)
 	if err != nil {
 		return err
 	}

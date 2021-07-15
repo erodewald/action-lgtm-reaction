@@ -21,6 +21,7 @@ import (
 type Input struct {
 	Trigger  string
 	Override bool
+	Enterprise bool
 	Source   string
 }
 

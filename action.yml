@@ -6,8 +6,12 @@ inputs:
     description: 'Trigger comment on issue to send reaction'
     required: false
     default: '["^lgtm$", "^[gG]ood [jJ]ob!?$"]'
-  overide:
+  override:
     description: 'Whether the original comment is overridden'
+    required: false
+    default: 'false'
+  enterprise:
+    description: 'Define a GitHub Enterprise Server instance'
     required: false
     default: 'false'
   source:

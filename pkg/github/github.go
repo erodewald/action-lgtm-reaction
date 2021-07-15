@@ -16,12 +16,18 @@ package github
 
 import (
 	"context"
+	"os"
 
-	"github.com/google/go-github/v28/github"
+	"github.com/google/go-github/v37/github"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 
 	"github.com/micnncim/action-lgtm-reaction/pkg/pointer"
+)
+
+var (
+	githubBaseUrl = os.Getenv("GITHUB_API_URL")
+	githubUploadUrl = os.Getenv("GITHUB_API_URL")
 )
 
 type Client struct {
@@ -29,7 +35,7 @@ type Client struct {
 	log          *zap.Logger
 }
 
-func NewClient(token string) (*Client, error) {
+func NewClient(token string, enterprise bool) (*Client, error) {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
@@ -39,10 +45,22 @@ func NewClient(token string) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Client{
-		githubClient: github.NewClient(tc),
-		log:          log,
-	}, nil
+	if enterprise {
+		ec, err := github.NewEnterpriseClient(githubBaseUrl, githubUploadUrl, tc)
+		if err != nil {
+			return nil, err
+		}
+		return &Client{
+			githubClient: ec,
+			log:          log,
+		}, nil
+	} else {
+		return &Client{
+			githubClient: github.NewClient(tc),
+			log:          log,
+		}, nil
+	}
+
 }
 
 func (c *Client) CreateIssueComment(ctx context.Context, owner, repo string, number int, body string) error {
