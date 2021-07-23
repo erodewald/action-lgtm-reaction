@@ -25,16 +25,19 @@ func TestGetInput(t *testing.T) {
 	var (
 		envInputTrigger  = "INPUT_TRIGGER"
 		envInputOverride = "INPUT_OVERRIDE"
+		envInputCaseInsensitive = "INPUT_CASE_INSENSITIVE"
 		envInputEnterprise = "INPUT_ENTERPRISE"
 		envInputSource   = "INPUT_SOURCE"
 	)
 	orgInputTrigger := os.Getenv(envInputTrigger)
 	orgInputOverride := os.Getenv(envInputOverride)
+	orgInputCaseInsensitive := os.Getenv(envInputCaseInsensitive)
 	orgInputEnterprise := os.Getenv(envInputEnterprise)
 	orgInputSource := os.Getenv(envInputSource)
 	defer func() {
 		os.Setenv(envInputTrigger, orgInputTrigger)
 		os.Setenv(envInputOverride, orgInputOverride)
+		os.Setenv(envInputCaseInsensitive, orgInputCaseInsensitive)
 		os.Setenv(envInputEnterprise, orgInputEnterprise)
 		os.Setenv(envInputSource, orgInputSource)
 	}()
@@ -48,6 +51,7 @@ func TestGetInput(t *testing.T) {
 			want: Input{
 				Trigger:  "trigger",
 				Override: true,
+				CaseInsensitive: false,
 				Enterprise: true,
 				Source:   "lgtmapp",
 			},
@@ -58,6 +62,7 @@ func TestGetInput(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			os.Setenv(envInputTrigger, tt.want.Trigger)
 			os.Setenv(envInputOverride, fmt.Sprint(tt.want.Override))
+			os.Setenv(envInputCaseInsensitive, fmt.Sprint(tt.want.CaseInsensitive))
 			os.Setenv(envInputEnterprise, fmt.Sprint(tt.want.Enterprise))
 			os.Setenv(envInputSource, tt.want.Source)
 

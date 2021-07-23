@@ -21,7 +21,8 @@ import (
 type Input struct {
 	Trigger  string
 	Override bool
-	Enterprise bool
+	CaseInsensitive bool `default:"true"`
+	Enterprise bool `default:"false"`
 	Source   string
 }
 

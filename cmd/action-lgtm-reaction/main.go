@@ -78,7 +78,7 @@ func run() error {
 		return err
 	}
 	if !needCreateComment && !needUpdateComment && !needUpdateReview {
-		fmt.Fprintf(os.Stderr, "no need to do any action\n")
+		fmt.Fprintf(os.Stderr, "::debug::No need to do any action\n")
 		return nil
 	}
 
@@ -142,19 +142,20 @@ func createLGTMClient(source string) (c lgtm.Client, err error) {
 
 func checkActionNeeded(e *GitHubEvent) (needCreateComment, needUpdateComment, needUpdateReview bool, err error) {
 	var (
-		trigger  = input.Trigger
-		override = input.Override
+		trigger         = input.Trigger
+		override        = input.Override
+		caseInsensitive = input.CaseInsensitive
 	)
 
 	var (
 		matchComment bool
 		matchReview  bool
 	)
-	matchComment, err = matchTrigger(trigger, e.Comment.Body)
+	matchComment, err = matchTrigger(trigger, e.Comment.Body, caseInsensitive)
 	if err != nil {
 		return
 	}
-	matchReview, err = matchTrigger(trigger, e.Review.Body)
+	matchReview, err = matchTrigger(trigger, e.Review.Body, caseInsensitive)
 	if err != nil {
 		return
 	}
@@ -200,12 +201,16 @@ func parseTrigger(trigger string) ([]string, error) {
 	return a, nil
 }
 
-func matchTrigger(trigger, target string) (bool, error) {
+func matchTrigger(trigger, target string, caseInsensitive bool) (bool, error) {
 	regexps, err := parseTrigger(trigger)
 	if err != nil {
 		return false, err
 	}
 	for _, s := range regexps {
+		if caseInsensitive && !strings.HasPrefix(s, "(?i)") {
+			s = fmt.Sprintf("(?i)%s", s)
+		}
+		fmt.Fprintln(os.Stdout, fmt.Sprintf("::debug::Matching %s regexp: %s", target, s))
 		r := regexp.MustCompile(s)
 		if r.MatchString(target) {
 			return true, nil
